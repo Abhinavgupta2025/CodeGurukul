@@ -11,7 +11,7 @@ authRouter.post('/login',login);
 authRouter.post('/logout',userMiddleware,logout);
 // authRouter.post('/forgotPassword',forgotPassword);
 // authRouter.get('/getProfile',getProfile);
-
+let a = "hi"
 module.exports = authRouter;
 
  
