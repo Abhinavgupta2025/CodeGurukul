@@ -1,12 +1,12 @@
 
 const { json } = require("express");
 const jwt = require("jsonwebtoken");
-const User = require("../models/users");
+const Users = require("../models/users");
 const redisClient = require("../config/redis");
 
 const adminMiddleware = async(req,res,next)=>{
         try{
-            const {token} = req.cookies;
+            const {tokesn} = req.cookies;
             if(!token)
                 throw new Error("Token is invald");
 
