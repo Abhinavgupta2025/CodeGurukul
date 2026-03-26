@@ -8,7 +8,7 @@ const adminMiddleware = async(req,res,next)=>{
         try{
             const {tokesn} = req.cookies;
             if(!token)
-                throw new Error("Token is invald");
+                throw new Error("Token is invalid");
 
             const payload = await jwt.verify(token,process.env.JWT_KEY);
 
