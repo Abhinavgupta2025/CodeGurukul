@@ -1,40 +1,49 @@
-
-const { json } = require("express");
 const jwt = require("jsonwebtoken");
-const Users = require("../models/users");
-const redisClient = require("../config/redis");
+const User = require("../models/user");
+const redisClient = require("../config/redis")
 
-const adminMiddleware = async(req,res,next)=>{
-        try{
-            const {tokesn} = req.cookies;
-            if(!token)
-                throw new Error("Token is invalid");
+const adminMiddleware = async (req,res,next)=>{
 
-            const payload = await jwt.verify(token,process.env.JWT_KEY);
+    try{
 
-            const {_id} = payload;
+        const {token} = req.cookies;
+        if(!token)
+            throw new Error("Token is not persent");
 
-            if(payload.role!='admin')
-                throw new error("invalid token"); 
-            
-            if(!_id)
-                throw new Error("Id Not found");
+        const payload = jwt.verify(token,process.env.JWT_KEY);
 
-            const result = await User.findById(_id);
+        const {_id} = payload;
 
-            if(!result)
-                throw new Error("User not found");
-
-            const isBlocked = await redisClient.exists(`token: ${token}`);
-
-            if(isBlocked)
-                throw new Error("Invalid Token");
-            req.result = result;
-            next(); 
+        if(!_id){
+            throw new Error("Invalid token");
         }
-        catch(err){
-              console.log("error" + err);
-              return res.status(401).json({error: err.message});
+
+        const result = await User.findById(_id);
+
+        if(payload.role!='admin')
+            throw new Error("Invalid Token");
+
+        if(!result){
+            throw new Error("User Doesn't Exist");
         }
+
+        // Redis ke blockList mein persent toh nahi hai
+
+        const IsBlocked = await redisClient.exists(`token:${token}`);
+
+        if(IsBlocked)
+            throw new Error("Invalid Token");
+
+        req.result = result;
+
+
+        next();
+    }
+    catch(err){
+        res.status(401).send("Error: "+ err.message)
+    }
+
 }
+
+
 module.exports = adminMiddleware;
